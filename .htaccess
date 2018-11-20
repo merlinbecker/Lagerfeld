@@ -1,3 +1,30 @@
-Options +FollowSymLinks
-RewriteEngine on
-RewriteRule ^([^/]*)$ index.php/?command=$1 [L,QSA]
+#htaccess by merlinbecker
+#date 31.03.2017
+#rewrite rule is from here 
+#http://stackoverflow.com/questions/8595964/redirect-all-traffic-to-index-php-using-mod-rewrite
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f  
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteRule ^(.*)$ index.php [L,QSA]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,3 +2,6 @@ dies ist der erste Log Eintrag...das Projekt lagerfeld beginnt
 das Projekt soll weitestgehend über die Unix Shell erstellt und bearbeitet werden
 Ich beginne mit der Erstellung der htaccess, um eine gute Aufrufstruktur zu erhalten
 das vi cheat sheet befindet sich hier http://www.lagmonster.org/docs/vi.html
+Autocompletition zu vim hinzugefügt https://jordaneldredge.com/blog/setting-up-php-completion-in-vim/
+Htaccess lässt sich nicht wie gewünscht einstellen, das Problem muss verschoben werden 
+Beginne mit dem Erstellen der index.php nach dem Vorbild meines alten Projektes TODO API 
