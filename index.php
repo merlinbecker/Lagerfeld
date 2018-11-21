@@ -6,6 +6,7 @@
 * @created 20.11.2018
 **/
 
+require_once "vendor/autoload.php";
 
 /**
  * headers: allow cross origin access
@@ -63,9 +64,9 @@ $provider = new \League\OAuth2\Client\Provider\GenericProvider([
     'clientId'                => 'demoapp',    // The client ID assigned to you by the provider
     'clientSecret'            => 'demopass',   // The client password assigned to you by the provider
     'redirectUri'             => 'http://example.com/your-redirect-url/',
-    'urlAuthorize'            => 'http://brentertainment.com/oauth2/lockdin/authorize',
-    'urlAccessToken'          => 'http://brentertainment.com/oauth2/lockdin/token',
-    'urlResourceOwnerDetails' => 'http://brentertainment.com/oauth2/lockdin/resource'
+    'urlAuthorize'            => 'https://lagerfeld.auth.eu-west-1.amazoncognito.com/authorize',
+    'urlAccessToken'          => 'https://lagerfeld.auth.eu-west-1.amazoncognito.com/token',
+    'urlResourceOwnerDetails' => 'https://lagerfeld.auth.eu-west-1.amazoncognito.com/resource'
 ]);
 
 
