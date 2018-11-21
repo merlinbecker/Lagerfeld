@@ -59,6 +59,14 @@ function parseServerArguments(){
 	return $output;
 }
 
+$provider = new \League\OAuth2\Client\Provider\GenericProvider([
+    'clientId'                => 'demoapp',    // The client ID assigned to you by the provider
+    'clientSecret'            => 'demopass',   // The client password assigned to you by the provider
+    'redirectUri'             => 'http://example.com/your-redirect-url/',
+    'urlAuthorize'            => 'http://brentertainment.com/oauth2/lockdin/authorize',
+    'urlAccessToken'          => 'http://brentertainment.com/oauth2/lockdin/token',
+    'urlResourceOwnerDetails' => 'http://brentertainment.com/oauth2/lockdin/resource'
+]);
 
 
 echo "index!";
