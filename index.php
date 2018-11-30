@@ -8,6 +8,8 @@
 * @todo always refactor!
 
 *currently doing: OAUTH2
+
+* https://stackoverflow.com/questions/45828654/aws-cognito-user-pool-oauth-rest-api-call-examples-exist
 */
 
 /**
@@ -27,10 +29,6 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header("Access-Control-Allow-Origin: *");
 
 session_start();
-
-echo "<pre>";
-	print_r($_SESSION);
-echo "</pre>";
 
 //ob_start();
 
@@ -146,8 +144,13 @@ if (!isset($_GET['code'])) {
 		echo "</pre>";
 		*/
 		$oauth=(array)$conf['oauth_credentials'];
+		echo "<pre>";
+   
+     print_r($oauth);
+   echo "</pre>";
+   
 		
-		
+   if(isset($oauth['proxy'])){
 		stream_context_set_default(
 		 array(
 		  'http' => array(
@@ -155,7 +158,7 @@ if (!isset($_GET['code'])) {
 		   // Remove the 'header' option if proxy authentication is not required
 		  )
 		 )
-		);
+		);}
 		
 		$jwks_json = file_get_contents($oauth['urlResourceOwnerDetails']);
 		$jwk = JWK::parseKeySet($jwks_json);
