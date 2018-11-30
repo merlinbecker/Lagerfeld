@@ -1,0 +1,3 @@
+Refactor OAUTH identifikation
+OAUTH Abfrage nun endlich über Umwege zum Laufen gebracht
+Datenbankanbindung über PDO https://packagist.org/packages/slim/pdo
