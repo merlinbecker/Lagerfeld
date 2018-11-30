@@ -7,9 +7,9 @@
 *
 * @todo always refactor!
 
-*currently doing: OAUTH2
+*currently doing: Database
 
-* https://stackoverflow.com/questions/45828654/aws-cognito-user-pool-oauth-rest-api-call-examples-exist
+* https://packagist.org/packages/slim/pdo
 */
 
 /**
@@ -19,8 +19,6 @@
 require_once "vendor/autoload.php";
 require_once "lf_config.php";
 
-use Firebase\JWT\JWK;
-use Firebase\JWT\JWT;
 /***********************************************/
 /**
  * headers: allow cross origin access
@@ -90,7 +88,6 @@ $provider = new \League\OAuth2\Client\Provider\GenericProvider((array)$conf['oau
 //config session var. wenn 
 if(isset($_POST['access_token'])) $_SESSION['access_token']=$_POST['access_token'];
 
-
 // If we don't have an authorization code then get one
 if (!isset($_GET['code'])) {
     // Fetch the authorization URL from the provider; this returns the
@@ -130,8 +127,8 @@ if (!isset($_GET['code'])) {
 
         // Using the access token, we may look up details about the
         // resource owner.
-        //$resourceOwner = $provider->getResourceOwner($accessToken);
-		/*
+        $resourceOwner = $provider->getResourceOwner($accessToken);
+		
 		echo "<pre>";
 			print_r($resourceOwner);
 		echo "</pre>";
@@ -142,63 +139,14 @@ if (!isset($_GET['code'])) {
 		echo "<pre>";
 			print_r($owner);
 		echo "</pre>";
-		*/
+		
 		$oauth=(array)$conf['oauth_credentials'];
 		echo "<pre>";
    
      print_r($oauth);
-   echo "</pre>";
-   
-		
-   if(isset($oauth['proxy'])){
-		stream_context_set_default(
-		 array(
-		  'http' => array(
-		   'proxy' => "tcp://".$oauth['proxy']
-		   // Remove the 'header' option if proxy authentication is not required
-		  )
-		 )
-		);}
-		
-		$jwks_json = file_get_contents($oauth['urlResourceOwnerDetails']);
-		$jwk = JWK::parseKeySet($jwks_json);
-
-		$tks = explode('.', $accessToken->getToken());
-		list($headb64, $bodyb64, $cryptob64) = $tks;
-		$jwt_header = json_decode(base64_decode($headb64),true);
-		$jwt_body = json_decode(base64_decode($bodyb64),true);
-		$key=$jwk[$jwt_header["kid"]];
-
-		try
-		{
-			$decoded = JWT::decode($accessToken->getToken(), $key, array($jwt_header["alg"]));
-			$decoded_array = (array) $decoded;
-			
-			echo "<pre>";
-				print_r($decoded);
-			echo "</pre>";
-			
-			// GREAT SUCCESS!
-		}
-		catch (\Exception $e)
-		{
-			// TOKEN COULDN'T BE VALIDATED
-		}
-		
-		
-		
-		
-        // The provider provides a way to get an authenticated API request for
-        // the service, using the access token; it returns an object conforming
-        // to Psr\Http\Message\RequestInterface.
-     /*   $request = $provider->getAuthenticatedRequest(
-            'GET',$conf['oauth_credentials']['urlResourceOwnerDetails'],
-            $accessToken
-        );
-	*/
+	echo "</pre>";
     } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
         // Failed to get the access token or user details.
-		
 		unset($_SESSION);
 		session_destroy();
 		
@@ -207,10 +155,7 @@ if (!isset($_GET['code'])) {
 
 }
 
-
-
 echo "index!";
-
 echo "<pre>";
 print_r(parseServerArguments());
 echo "</pre>";
