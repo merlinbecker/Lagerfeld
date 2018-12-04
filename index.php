@@ -7,6 +7,7 @@
 *
 * @todo always refactor!
 
+*currently doing as refactor: OAUTH
 *currently doing: Database
 
 * https://packagist.org/packages/slim/pdo
@@ -30,6 +31,41 @@ session_start();
 
 //ob_start();
 
+class User{
+	var $email;
+	var $uid;
+	var $oauth_token;
+	
+	function __construct(){
+		if(!$this->isLoggedIn()){
+			$this->logIn();
+		}
+	}
+	
+	function isLoggedIn(){
+		return (isset($this->uid)&&is_numeric($this->uid))?true:false;
+	}
+	
+	function logIn(){
+		//if the user already has a session id
+		if(isset($_SESSION['user_id'])&&(is_numeric($_SESSION['user_id'])) $this->uid=$_SESSION['user_id'];
+		//if the user sends a oauth access token
+		elseif(isset($_POST['access_token'])){
+			//try to connect, if not successful, try to get a refresh token
+		}
+		//if the user has got a grant token
+		elseif(isset($_GET['code'])){
+			
+		}
+		else{
+			
+		}
+	}
+	
+	function logout(){
+		unset $this->uid;
+	}
+}
 
 
 /**
