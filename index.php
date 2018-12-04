@@ -33,37 +33,101 @@ session_start();
 
 class User{
 	var $email;
-	var $uid;
+	var $userdata;
 	var $oauth_token;
-	
-	function __construct(){
-		if(!$this->isLoggedIn()){
-			$this->logIn();
-		}
+	var $provider;
+	function __construct($conf,$database){
+		$this->provider= new \League\OAuth2\Client\Provider\GenericProvider((array)$conf['oauth_credentials']);
+		$this->logIn();
 	}
 	
 	function isLoggedIn(){
-		return (isset($this->uid)&&is_numeric($this->uid))?true:false;
+		return (isset($this->userdata)&&is_array($this->userdata))?true:false;
+	}
+	private function getNotLoggedInStatus(){
+		$output=array();
+		$output['status']='not logged in';
+		$output['authURL']=$this->provider->getAuthorizationUrl();
+		return $output;
 	}
 	
 	function logIn(){
 		//if the user already has a session id
-		if(isset($_SESSION['user_id'])&&(is_numeric($_SESSION['user_id'])) $this->uid=$_SESSION['user_id'];
+		if(isset($_SESSION['userdata'])&&(is_numeric($_SESSION['userdata'])){
+			$this->userdata=$_SESSION['userdata'];
+			return $_SESSION['userdata'];
+		}
 		//if the user sends a oauth access token
 		elseif(isset($_POST['access_token'])){
 			//try to connect, if not successful, try to get a refresh token
+			new \League\OAuth2\Client\Token();
+			$existingAccessToken = getAccessTokenFromYourDataStore();
+
+			if ($existingAccessToken->hasExpired()) {
+				$newAccessToken = $provider->getAccessToken('refresh_token', [
+					'refresh_token' => $existingAccessToken->getRefreshToken()
+				]);
+
+				// Purge old access token and store new access token to your data store.
+			}
 		}
 		//if the user has got a grant token
 		elseif(isset($_GET['code'])){
-			
+			if (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
+				if (isset($_SESSION['oauth2state'])) {
+					unset($_SESSION['oauth2state']);
+				}
+				return $this->getNotLoggedInStatus();
+			}
+			else{
+				  try {
+						// Try to get an access token using the authorization code grant.
+						$accessToken = $provider->getAccessToken('authorization_code', [
+							'code' => $_GET['code']
+						]);
+						
+						// We have an access token, which we may use in authenticated
+						// requests against the service provider's API.
+						echo 'Access Token: ' . $accessToken->getToken() . "<br>";
+						echo 'Refresh Token: ' . $accessToken->getRefreshToken() . "<br>";
+						echo 'Expired in: ' . $accessToken->getExpires() . "<br>";
+						echo 'Already expired? ' . ($accessToken->hasExpired() ? 'expired' : 'not expired') . "<br>";
+
+						// Using the access token, we may look up details about the
+						// resource owner.
+						$resourceOwner = $provider->getResourceOwner($accessToken);
+						echo "<pre>";
+							print_r($resourceOwner);
+						echo "</pre>";
+						
+						$owner=$resourceOwner->toArray();
+						
+						echo "OWNER!";
+						echo "<pre>";
+							print_r($owner);
+						echo "</pre>";
+						
+						$oauth=(array)$conf['oauth_credentials'];
+						echo "<pre>";
+						print_r($oauth);
+						echo "</pre>";
+					} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+						// Failed to get the access token or user details.
+						unset($_SESSION);
+						session_destroy();
+						exit($e->getMessage());
+					}
+			}
 		}
 		else{
-			
+			// Get the state generated for you and store it to the session.
+			$_SESSION['oauth2state'] = $this->provider->getState();
+			return $this->getNotLoggedInStatus();
 		}
 	}
 	
 	function logout(){
-		unset $this->uid;
+		unset $_SESSION['userdata'];
 	}
 }
 
@@ -121,8 +185,6 @@ else{
 
 $provider = new \League\OAuth2\Client\Provider\GenericProvider((array)$conf['oauth_credentials']);
 
-//config session var. wenn 
-if(isset($_POST['access_token'])) $_SESSION['access_token']=$_POST['access_token'];
 
 // If we don't have an authorization code then get one
 if (!isset($_GET['code'])) {
