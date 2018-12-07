@@ -7,8 +7,20 @@ uses git from https://github.com/thephpleague/oauth2-client
 class User{
 	var $userdata;
 	var $provider;
+	var $db;
+	var $userid;
 	function __construct($conf,$database){
+		$this->userid=0;
 		$this->provider= new \League\OAuth2\Client\Provider\GenericProvider((array)$conf['oauth_credentials']);
+		$this->db=$database;
+	}
+	
+	function getUserId(){
+		if($this->userid<=0){
+			$id=$db->row("SELECT id FROM users WHERE email=?",$this->userdata['email']);
+			$this->userid=$id['id'];
+		}
+		return $this->userid;
 	}
 	
 	function isLoggedIn(){
@@ -27,7 +39,12 @@ class User{
 	private function getLoggedInStatus(){
 		$output=array();
 		$output['status']='logged in';
-		$output['userdata']=$this->userdata;
+		$output['userdata']=array(
+			"access_token"=>$this->userdata['access_token']
+		);
+		//insert login time
+		$uid=$this->getUserId();
+		
 		return $output;
 	}
 	
@@ -40,20 +57,50 @@ class User{
 		//if the user sends a oauth access token
 		elseif(isset($_POST['access_token'])){
 			//try to connect, if not successful, try to get a refresh token
-			//check database for access token!
-			/*
+			$oauth=$db->row("SELECT oauth FROM users WHERE access_token=?",$_POST['access_token']);
+			$oauth=unserialize($oauth['oauth']);
 			
 			
-			$existingAccessToken = new \League\OAuth2\Client\Token(array("access_token"=>$_POST['access_token']));
+			$existingAccessToken = new \League\OAuth2\Client\Token(array(
+				"access_token"=>$oauth['access_token'],
+				"expires"=>$oauth['expires'],
+				"refresh_token"=>$oauth['refresh_token']
+			));
 			
 			if ($existingAccessToken->hasExpired()) {
 				$newAccessToken = $provider->getAccessToken('refresh_token', [
 					'refresh_token' => $existingAccessToken->getRefreshToken()
 				]);
-				// Purge old access token and store new access token to your data store.
+				
+				$resourceOwner = $this->provider->getResourceOwner($newAccessToken);
+				$owner=$resourceOwner->toArray();
+						
+				$this->userdata=array(
+					"access_token"=>$newAccessToken->getToken(),
+					"refresh_token"=>$newAccessToken->getRefreshToken(),
+					"expires"=>$newAccessToken->getExpires(),
+					"email"=>$owner["email"]
+				);
+						
+						
+				$this->db->update('users', [
+					'oauth' => serialize($this->userdata),
+					'access_token'=>$accessToken->getToken()
+				], [
+					'email' => $this->userdata['email']
+				]);
+	
+						
+				$this->db->insert('user_history', [
+						'uid' => $uid,
+						'task' => "login",
+						'value'=>"refresh_token request",
+						'timestamp'=>time()
+				]);
+				
+				$_SESSION['userdata']=$this->userdata;
+				return $this->getLoggedInStatus();				
 			}
-			
-			*/
 		}
 		//if the user has got a grant token
 		elseif(isset($_GET['code'])){
@@ -78,7 +125,30 @@ class User{
 							"expires"=>$accessToken->getExpires(),
 							"email"=>$owner["email"]
 						);
-						//@todo: store userdata to database
+						
+						$mail=$this->db->row("SELECT * FROM users WHERE email = ?",$this->userdata['email']);
+						//create user if not exists
+						if(strlen($mail['email'])<3){
+							$this->db->insert('users', [
+								'email' => $this->userdata['email'],
+								'access_token'=>$accessToken->getToken(),
+								'oauth' => serialize($this->userdata)
+							]);
+						}else{
+							$this->db->update('users', [
+								'oauth' => serialize($this->userdata),
+								'access_token'=>$accessToken->getToken()
+							], [
+								'email' => $this->userdata['email']
+							]);
+						}
+						
+						$this->db->insert('user_history', [
+								'uid' => $uid,
+								'task' => "login",
+								'timestamp'=>time()
+							]);
+						
 						$_SESSION['userdata']=$this->userdata;
 						return $this->getLoggedInStatus();
 					} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {

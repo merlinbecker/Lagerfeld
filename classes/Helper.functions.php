@@ -37,4 +37,131 @@ function parseServerArguments(){
 
 	return $output;
 }
+
+function doDBChecks(){
+	//do some db setup, if not existing
+	if(!isset($_SESSION['db_version'])||($_SESSION['db_version']!=VERSION)){
+		echo "------------------<br/>"
+		."doing db_checks <br/>"
+		."---------------------<br/>";
+		
+		//check the settings table
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM settings");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE settings ( "
+							."`key` VARCHAR(128) NOT NULL ,"
+							." `value` VARCHAR(128) NOT NULL,"
+							."PRIMARY KEY (`key`)) ENGINE = InnoDB;");
+				$db->insert('settings',[
+					'key'=>'settings',
+					'value'=>VERSION
+				]);
+			}
+			else echo $e->getMessage();
+		}
+		
+		//check the users table
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM users");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE users ( "
+							."`id` BIGINT NOT NULL AUTO_INCREMENT,"
+							."`email` VARCHAR(255) NOT NULL,"
+							."`access_token` VARCHAR(255) NOT NULL,"
+							."`oauth` TEXT NOT NULL,"
+							."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM user_history");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE user_history ( "
+							."`uid` BIGINT NOT NULL ,"
+							."`task` VARCHAR(255) NOT NULL ,"
+							."`value` BIGINT NOT NULL ,"
+							."`timestamp` BIGINT NOT NULL ) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM item");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE item ( "
+						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
+						."`name` VARCHAR(255) NOT NULL ,"
+						."`notes` TEXT NOT NULL ,"
+						."`picture` TEXT NOT NULL ,"
+						."`best_before` BIGINT NOT NULL ,"
+						."`url` VARCHAR(255) NOT NULL ,"
+						."`parent` BIGINT NOT NULL ,"
+						."`uid` BIGINT NOT NULL ,"
+						."`lat` DOUBLE NOT NULL ,"
+						."`lng` DOUBLE NOT NULL ,"
+						."`level` TINYINT NOT NULL ,"
+						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM item_history");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE item_history ( "
+						."`iid` BIGINT NOT NULL ,"
+						."`task` VARCHAR(255) NOT NULL ,"
+						."`value` BIGINT NULL ,"
+						."`timestamp` BIGINT NOT NULL ) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM item_future");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE item_future ( "
+						."`iid` BIGINT NOT NULL ,"
+						."`task` VARCHAR(255) NOT NULL ,"
+						."`value` BIGINT NOT NULL) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM categories");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE categories ( "
+						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
+						."`name` VARCHAR(255) NOT NULL ,"
+						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+			}
+			else echo $e->getMessage();
+		}
+		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM item_categories");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE item_categories ( "
+						."`iid` BIGINT NOT NULL ,"
+						."`name` VARCHAR(255) NOT NULL ) ENGINE = InnoDB;");		
+			}
+			else echo $e->getMessage();
+		}
+		
+		$_SESSION['db_version']=VERSION;
+		$db->update('settings',['value' => VERSION],['key' => 'version']);
+	}
+}
 ?>
