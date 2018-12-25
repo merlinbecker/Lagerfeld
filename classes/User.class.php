@@ -9,9 +9,11 @@ class User{
 	var $provider;
 	var $db;
 	var $userid;
+	var $conf;
 	function __construct($conf,$database){
 		$this->userid=0;
-		$this->provider= new \League\OAuth2\Client\Provider\GenericProvider((array)$conf['oauth_credentials']);
+		$this->conf=(array)$conf['oauth_credentials'];
+		$this->provider= new \League\OAuth2\Client\Provider\GenericProvider($this->conf);
 		$this->db=$database;
 	}
 	
@@ -56,7 +58,16 @@ class User{
 		}
 		//if the user sends a oauth access token
 		elseif(isset($_POST['access_token'])){
-			//try to connect, if not successful, try to get a refresh token
+			        $request = $provider->getAuthenticatedRequest(
+            			'GET',
+            			$this->conf['urlResourceOwnerDetails'],
+            			$_POST['access_token']
+        			);
+				echo "<pre>";
+				print_r($request);
+				echo "</pre>";
+
+			/*//try to connect, if not successful, try to get a refresh token
 			$oauth=$db->row("SELECT oauth FROM users WHERE access_token=?",$_POST['access_token']);
 			$oauth=unserialize($oauth['oauth']);
 			
@@ -100,7 +111,7 @@ class User{
 				
 				$_SESSION['userdata']=$this->userdata;
 				return $this->getLoggedInStatus();				
-			}
+			}*/
 		}
 		//if the user has got a grant token
 		elseif(isset($_GET['code'])){
@@ -116,6 +127,7 @@ class User{
 						$accessToken = $this->provider->getAccessToken('authorization_code', [
 							'code' => $_GET['code']
 						]);
+						
 						$resourceOwner = $this->provider->getResourceOwner($accessToken);
 						$owner=$resourceOwner->toArray();
 						
@@ -130,17 +142,17 @@ class User{
 						//create user if not exists
 						if(strlen($mail['email'])<3){
 							$this->db->insert('users', [
-								'email' => $this->userdata['email'],
-								'access_token'=>$accessToken->getToken(),
-								'oauth' => serialize($this->userdata)
+								'email' => $this->userdata['email']//,
+								//'access_token'=>$accessToken->getToken(),
+								//'oauth' => serialize($this->userdata)
 							]);
 						}else{
-							$this->db->update('users', [
+							/*$this->db->update('users', [
 								'oauth' => serialize($this->userdata),
 								'access_token'=>$accessToken->getToken()
 							], [
 								'email' => $this->userdata['email']
-							]);
+							]);*/
 						}
 						
 						$this->db->insert('user_history', [

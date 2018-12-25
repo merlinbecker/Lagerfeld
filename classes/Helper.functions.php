@@ -38,7 +38,7 @@ function parseServerArguments(){
 	return $output;
 }
 
-function doDBChecks(){
+function doDBChecks($db){
 	//do some db setup, if not existing
 	if(!isset($_SESSION['db_version'])||($_SESSION['db_version']!=VERSION)){
 		echo "------------------<br/>"
@@ -71,8 +71,8 @@ function doDBChecks(){
 				$db->run("CREATE TABLE users ( "
 							."`id` BIGINT NOT NULL AUTO_INCREMENT,"
 							."`email` VARCHAR(255) NOT NULL,"
-							."`access_token` VARCHAR(255) NOT NULL,"
-							."`oauth` TEXT NOT NULL,"
+							//."`access_token` VARCHAR(255) NOT NULL,"
+							//."`oauth` TEXT NOT NULL,"
 							."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
 			else echo $e->getMessage();
@@ -144,6 +144,7 @@ function doDBChecks(){
 				$db->run("CREATE TABLE categories ( "
 						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
 						."`name` VARCHAR(255) NOT NULL ,"
+						."`uid` BIGINT NOT NULL,"
 						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
 			else echo $e->getMessage();

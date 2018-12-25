@@ -11,14 +11,12 @@
 *currently doing: Database
 *
 */
-
 /**
 * Requirements
 **/
 /*************************************************/
 require_once "vendor/autoload.php";
 require_once "lf_config.php";
-
 require_once "classes/User.class.php";
 require_once "classes/Helper.functions.php";
 
@@ -30,8 +28,8 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header("Access-Control-Allow-Origin: *");
 
 define("VERSION",0.1);
-
 session_start();
+
 
 //ob_start();
 
@@ -46,17 +44,15 @@ else{
 	$conf=array();
 }
 $db_conf=$conf['db_credentials'];
-
 $db = \ParagonIE\EasyDB\Factory::create(
     'mysql:host='.$db_conf->host.';dbname='.$db_conf->database,
     $db_conf->user,
     $db_conf->password
 );
 
-doDBChecks();
+doDBChecks($db);
 
 $user=new User($conf,$db);
-
 $args=parseServerArguments();
 
 switch($args['commands'][0]){
