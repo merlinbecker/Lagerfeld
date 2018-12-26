@@ -66,6 +66,10 @@ switch($args['commands'][0]){
 			header("Location:".$user->getLoginUrl());
 		}
 	break;
+	case "auth":
+		$user->logIn();
+		header("Location:".$BASE_URL);
+	break;
 	default:
 		include("frontend/website.html");
 	break;
