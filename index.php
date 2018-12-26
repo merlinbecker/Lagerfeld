@@ -30,7 +30,6 @@ header("Access-Control-Allow-Origin: *");
 define("VERSION",0.1);
 session_start();
 
-
 //ob_start();
 
 /**
@@ -56,6 +55,17 @@ $user=new User($conf,$db);
 $args=parseServerArguments();
 
 switch($args['commands'][0]){
+	case "User":
+		if($args['commands'][1]=="Status"){
+			echo json_encode($user->logIn());
+		}
+		else if($args['commands'][1]=="Logout"){
+			echo json_encode($user->logout());
+		}
+		else if($args['commands'][1]=="LogIn"){
+			header("Location:".$user->getLoginUrl());
+		}
+	break;
 	default:
 		include("frontend/website.html");
 	break;
@@ -64,8 +74,6 @@ switch($args['commands'][0]){
 
 echo "<pre>";
 print_r($args);
-print_r($user->logIn());
 echo "</pre>";
-
 ?>
 

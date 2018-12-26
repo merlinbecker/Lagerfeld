@@ -15,16 +15,19 @@ class User{
 		$this->conf=(array)$conf['oauth_credentials'];
 		$this->provider= new \League\OAuth2\Client\Provider\GenericProvider($this->conf);
 		$this->db=$database;
+		$this->userdata=$_SESSION['userdata'];
 	}
 	
 	function getUserId(){
 		if($this->userid<=0){
-			$id=$db->row("SELECT id FROM users WHERE email=?",$this->userdata['email']);
+			$id=$this->db->row("SELECT id FROM users WHERE email=?",$this->userdata['email']);
 			$this->userid=$id['id'];
 		}
 		return $this->userid;
 	}
-	
+	function getLoginUrl(){
+		return $this->provider->getAuthorizationUrl();
+	}	
 	function isLoggedIn(){
 		return (isset($this->userdata)&&is_array($this->userdata))?true:false;
 	}
@@ -42,76 +45,51 @@ class User{
 		$output=array();
 		$output['status']='logged in';
 		$output['userdata']=array(
-			"access_token"=>$this->userdata['access_token']
+			"access_token"=>$this->userdata['access_token'],
+			"email"=>$this->userdata['email']
 		);
 		//insert login time
-		$uid=$this->getUserId();
-		
+		$this->userid=$this->getUserId();
 		return $output;
 	}
-	
+	private function getUserInfo($accesstoken){
+		$request = $this->provider->getAuthenticatedRequest(
+            			'GET',
+            			$this->conf['urlResourceOwnerDetails'],
+            			$accesstoken
+        			);
+		$client = new \GuzzleHttp\Client();
+		$response = $client->send($request);
+
+		return $response->getBody();
+	}	
 	function logIn(){
 		//if the user already has a session id
-		if(isset($_SESSION['userdata'])&&(is_numeric($_SESSION['userdata']))){
-			$this->userdata=$_SESSION['userdata'];
-			return getLoggedInStatus();
+		if($this->isLoggedIn()){
+			return $this->getLoggedInStatus();
 		}
 		//if the user sends a oauth access token
 		elseif(isset($_POST['access_token'])){
-			        $request = $provider->getAuthenticatedRequest(
-            			'GET',
-            			$this->conf['urlResourceOwnerDetails'],
-            			$_POST['access_token']
-        			);
-				echo "<pre>";
-				print_r($request);
-				echo "</pre>";
-
-			/*//try to connect, if not successful, try to get a refresh token
-			$oauth=$db->row("SELECT oauth FROM users WHERE access_token=?",$_POST['access_token']);
-			$oauth=unserialize($oauth['oauth']);
-			
-			
-			$existingAccessToken = new \League\OAuth2\Client\Token(array(
-				"access_token"=>$oauth['access_token'],
-				"expires"=>$oauth['expires'],
-				"refresh_token"=>$oauth['refresh_token']
-			));
-			
-			if ($existingAccessToken->hasExpired()) {
-				$newAccessToken = $provider->getAccessToken('refresh_token', [
-					'refresh_token' => $existingAccessToken->getRefreshToken()
-				]);
-				
-				$resourceOwner = $this->provider->getResourceOwner($newAccessToken);
-				$owner=$resourceOwner->toArray();
-						
-				$this->userdata=array(
-					"access_token"=>$newAccessToken->getToken(),
-					"refresh_token"=>$newAccessToken->getRefreshToken(),
-					"expires"=>$newAccessToken->getExpires(),
-					"email"=>$owner["email"]
-				);
-						
-						
-				$this->db->update('users', [
-					'oauth' => serialize($this->userdata),
-					'access_token'=>$accessToken->getToken()
-				], [
-					'email' => $this->userdata['email']
-				]);
-	
-						
+			$infos=json_decode($this->getUserInfo($_POST['accesstoken']));
+			if(isset($infos->email)){
+				$mail=$this->db->row("SELECT * FROM users WHERE email = ?",$this->userdata['email']);
+				//create user if not exists
+				if(strlen($mail['email'])<3){
+					$this->db->insert('users', [
+						'email' => $infos->email
+					]);
+				}
+				$this->userid=$this->getUserId();
+				$this->userdata['access_token']=$_POST['access_token'];
+				$this->userdata['email']=$infos['email'];	
 				$this->db->insert('user_history', [
-						'uid' => $uid,
-						'task' => "login",
-						'value'=>"refresh_token request",
-						'timestamp'=>time()
+					'uid' => $this->userid,
+					'task' => "login",
+					'timestamp'=>time()
 				]);
-				
-				$_SESSION['userdata']=$this->userdata;
-				return $this->getLoggedInStatus();				
-			}*/
+			return $this->getLoggedInStatus();
+			}
+			else return $this->getNotLoggedInStatus();
 		}
 		//if the user has got a grant token
 		elseif(isset($_GET['code'])){
@@ -142,21 +120,12 @@ class User{
 						//create user if not exists
 						if(strlen($mail['email'])<3){
 							$this->db->insert('users', [
-								'email' => $this->userdata['email']//,
-								//'access_token'=>$accessToken->getToken(),
-								//'oauth' => serialize($this->userdata)
+								'email' => $this->userdata['email']
 							]);
 						}else{
-							/*$this->db->update('users', [
-								'oauth' => serialize($this->userdata),
-								'access_token'=>$accessToken->getToken()
-							], [
-								'email' => $this->userdata['email']
-							]);*/
 						}
-						
 						$this->db->insert('user_history', [
-								'uid' => $uid,
+								'uid' => $this->userid,
 								'task' => "login",
 								'timestamp'=>time()
 							]);

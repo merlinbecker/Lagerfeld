@@ -1,0 +1,12 @@
+CACHE MANIFEST
+CACHE:
+https://code.jquery.com/jquery-3.3.1.min.js
+https://use.fontawesome.com/releases/v5.0.13/css/all.css
+https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.bundle.min.js
+https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css
+https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js
+https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js
+https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js
+#frontend/js/Base64.js
+#/frontend/css/app.css
+#/frontend/js/app.js
