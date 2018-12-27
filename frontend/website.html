@@ -9,7 +9,9 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="theme-color" content="#000000">
 		<title>Lagerfeld Version <?=VERSION?></title>
-		
+		<script type="text/javascript">
+			var BASE_URL="<?=$BASE_URL?>";
+		</script>	
 		<!-- todo maybe replace this with npm downloads -->
 		
 		<!--jquery-->
@@ -41,7 +43,7 @@
 	<body>
 	  <!-- Navigation Panel -->
 	  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-	      <a class="navbar-brand" href="#">LF <?=VERSION;?></a>
+	      <a class="navbar-brand" href="#"><span class="fa fa-box-open"></span>LF <?=VERSION;?></a>
 	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	      </button>
@@ -49,19 +51,116 @@
 	      <div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav mr-auto">
 		  <li class="nav-item" id="nav_new_item">
-		    <a class="nav-link" href="#"><span class="fa fa-plus-circle"></span>neues Item</a>
+		    <a class="nav-link" href="#"><span class="fa fa-plus-circle"></span>neuer Gegenstand</a>
 		  </li>
 		  <li class="nav-item" id="nav_user_login">
-		    <a class="nav-link" href="#"><span class="fa fa-sign-in-alt"></span>Log-In</a>
+		    <a class="nav-link" href="#" ><span class="fa fa-sign-in-alt"></span>Log-In</a>
 		  </li>
 		  <li class="nav-item" id="nav_user_settings">
-		    <a class="nav-link" href="#"><span class="fa fa-user"></span>USER</a>
+		    <a class="nav-link" href="#"><span class="fa fa-user"></span><span class="nav-desc">USER</span</a>
 		  </li>
 		</ul>
-		<form class="form-inline my-2 my-lg-0">
+		<form class="form-inline my-2 my-lg-0" id="nav_search">
 		  <input class="form-control mr-sm-2" type="search" placeholder="Suchen" aria-label="Suche">
 		</form>
 	      </div>
 	  </nav>
+
+	  <!--MODALS-->
+	  <!--Modal User Settings-->
+	  <div class="modal fade" id="modal_user_settings" tabindex="-1">
+	    <div class="modal-dialog">
+	      <div class="modal-content">
+	      <!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title">Benutzer</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+	      <!-- Modal body -->
+		<div class="modal-body" id="modal_user_settings_body">
+		</div>
+	      <!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-danger" id="btn_logout">Abmelden</button>
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Schließen</button>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	  
+	  <div class="modal fade" id="modal_new_item" tabindex="-1">
+	    <div class="modal-dialog modal-lg">
+	      <div class="modal-content">
+		<form id="new_item_form">
+	      <!-- Modal Header -->
+		<div class="modal-header">
+		  <h4 class="modal-title">neuer Gegenstand</h4>
+		  <button type="button" class="close" data-dismiss="modal">&times;</button>
+		</div>
+	      <!-- Modal body -->
+		<div class="modal-body" id="modal_new_item_body">
+			      <!--name-->
+			      <div class="form-group">
+				  <label for="newItemName">Name des Gegenstandes:</label>
+				  <input type="text" name="description" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=1>
+			      </div>
+			      <!--Anzahl-->
+			      <div class="form-group">
+				  <label for="newItemNumber">Anzahl:</label>
+				  <input type="number" class="form-control" id="newItemNumber" name="number" min="1" max="999" step="1" tabindex=2>
+			      </div>
+			      <!--picure-->
+			      <div class="form-group">
+				  <label for="newItemPicture">Bild:</label>
+				  <input type="file" class="form-control" id="newItemPicture" accept="image/*" tabindex=3>
+			      </div>
+			      <!--Kategorien-->
+			      <div class="form-group">
+				  <label for="newItemCategories">Kategorien:</label>
+				  <input type="text" class="form-control" id="newItemCategories" tabindex=4>
+			      </div>
+			      <!--Haltbarbis-->
+			      <div class="form-group">
+				  <label for="newItemBestBefore">Haltbar bis:</label>
+				  <input type="month" class="form-control" id="newItemBestBefore" tabindex=5>
+			      </div>
+			      <!--URL-->
+			      <div class="form-group">
+				  <label for="newItemURL">URL:</label>
+				  <input type="url" class="form-control" id="newItemBestBefore" placeholder="http://owncloud.com" tabindex=6>
+			      </div>
+			      <!--Location-->
+			      <div class="form-group">
+				  <label for="newItemLocation">Adresse des Gegenstandes:</label>
+				  <input type="text" class="form-control" id="newItemLocation" tabindex=7>
+			      </div>
+			      <!--Kommentare-->
+			      <div class="form-group">
+    				<label for="newItemsComments">Kommentare:</label>
+    				<textarea class="form-control" id="newItemsComments" rows="3" tabindex=8></textarea>
+			      </div>
+			      
+			      <button class="btn btn-outline-dark" aria-pressed="false" type="button">
+   				<i class="fa fa-calendar-alt"></i>
+			      </button>
+			      
+			      <button class="btn btn-outline-dark" aria-pressed="false" type="button">
+   				<i class="fa fa-link"></i>
+			      </button>
+			      
+			       <button class="btn btn-outline-dark" aria-pressed="false" type="button">
+   				<i class="fa fa-location-arrow"></i>
+			      </button>
+
+		</div>
+	      <!-- Modal footer -->
+		<div class="modal-footer">
+		  <button type="submit" class="btn btn-success" id="btn_save">Speichern</button>
+		</div>
+		</form>
+	      </div>
+	    </div>
+	  </div>
+
 	</body>
 </html>

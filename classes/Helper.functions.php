@@ -2,6 +2,7 @@
 /**
 * parseServerArguments: übernimmt das Extrahieren der Kommandoparameter aus den Servervariablen
 * @return Command and Query Params als Array
+* @todo refactor doDbChecks: auslagern in Datei
 **/
 function parseServerArguments(){
 	$output=array();
@@ -41,9 +42,6 @@ function parseServerArguments(){
 function doDBChecks($db){
 	//do some db setup, if not existing
 	if(!isset($_SESSION['db_version'])||($_SESSION['db_version']!=VERSION)){
-		echo "------------------<br/>"
-		."doing db_checks <br/>"
-		."---------------------<br/>";
 		
 		//check the settings table
 		
@@ -60,7 +58,7 @@ function doDBChecks($db){
 					'value'=>VERSION
 				]);
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		//check the users table
@@ -71,11 +69,9 @@ function doDBChecks($db){
 				$db->run("CREATE TABLE users ( "
 							."`id` BIGINT NOT NULL AUTO_INCREMENT,"
 							."`email` VARCHAR(255) NOT NULL,"
-							//."`access_token` VARCHAR(255) NOT NULL,"
-							//."`oauth` TEXT NOT NULL,"
 							."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		try{
@@ -88,7 +84,7 @@ function doDBChecks($db){
 							."`value` BIGINT NOT NULL ,"
 							."`timestamp` BIGINT NOT NULL ) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		try{
@@ -98,7 +94,6 @@ function doDBChecks($db){
 				$db->run("CREATE TABLE item ( "
 						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
 						."`name` VARCHAR(255) NOT NULL ,"
-						."`notes` TEXT NOT NULL ,"
 						."`picture` TEXT NOT NULL ,"
 						."`best_before` BIGINT NOT NULL ,"
 						."`url` VARCHAR(255) NOT NULL ,"
@@ -109,7 +104,7 @@ function doDBChecks($db){
 						."`level` TINYINT NOT NULL ,"
 						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		try{
@@ -122,7 +117,7 @@ function doDBChecks($db){
 						."`value` BIGINT NULL ,"
 						."`timestamp` BIGINT NOT NULL ) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		try{
@@ -134,7 +129,7 @@ function doDBChecks($db){
 						."`task` VARCHAR(255) NOT NULL ,"
 						."`value` BIGINT NOT NULL) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		try{
@@ -147,9 +142,23 @@ function doDBChecks($db){
 						."`uid` BIGINT NOT NULL,"
 						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
+		try{
+			$dbcheck = $db->run("SELECT 1 FROM item_comments");
+		}catch(Exception $e){
+			if($e->getCode()=="42S02"){
+				$db->run("CREATE TABLE item_comments ( "
+						."`iid` BIGINT NOT NULL, "
+						."`comment` VARCHAR(255) NOT NULL ,"
+						."`time` BIGINT NOT NULL)"
+						."ENGINE = InnoDB;");
+			}
+			else return $e->getMessage();
+		}
+		
+
 		try{
 			$dbcheck = $db->run("SELECT 1 FROM item_categories");
 		}catch(Exception $e){
@@ -158,7 +167,7 @@ function doDBChecks($db){
 						."`iid` BIGINT NOT NULL ,"
 						."`name` VARCHAR(255) NOT NULL ) ENGINE = InnoDB;");		
 			}
-			else echo $e->getMessage();
+			else return $e->getMessage();
 		}
 		
 		$_SESSION['db_version']=VERSION;
