@@ -94,14 +94,16 @@ function doDBChecks($db){
 				$db->run("CREATE TABLE item ( "
 						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
 						."`name` VARCHAR(255) NOT NULL ,"
-						."`picture` TEXT NOT NULL ,"
-						."`best_before` BIGINT NOT NULL ,"
-						."`url` VARCHAR(255) NOT NULL ,"
-						."`parent` BIGINT NOT NULL ,"
+						."`picture` TEXT ,"
+						."`best_before` BIGINT,"
+						."`url` VARCHAR(255) ,"
+						."`parent` BIGINT DEFAULT 0 ,"
 						."`uid` BIGINT NOT NULL ,"
-						."`lat` DOUBLE NOT NULL ,"
-						."`lng` DOUBLE NOT NULL ,"
-						."`level` TINYINT NOT NULL ,"
+						."`lat` DOUBLE ,"
+						."`lng` DOUBLE ,"
+						."`level` TINYINT,"
+						."`deleted` TINYINT(1) DEFAULT 0,"
+						."`container` TINYINT(1) DEFAULT 0,"
 						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
 			else return $e->getMessage();

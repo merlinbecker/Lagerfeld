@@ -95,45 +95,50 @@
 	      <!-- Modal Header -->
 		<div class="modal-header">
 		  <h4 class="modal-title">neuer Gegenstand</h4>
+		      <div class="form-check" style="margin-left:10px;">
+			  <input type="checkbox" class="form-check-input" id="newItemIsContainer">
+			  <label class="form-check-label" for="newItemIsContainer">Ist auch ein Behälter</label>
+			  <input type="file" id="newItemPicture" size=0 accept="image/*" >
+		      </div>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
 		</div>
 	      <!-- Modal body -->
 		<div class="modal-body" id="modal_new_item_body">
 			      <!--name-->
-			      <div class="form-group">
-				  <label for="newItemName">Name des Gegenstandes:</label>
-				  <input type="text" name="description" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=1>
-			      </div>
-			      <!--Anzahl-->
-			      <div class="form-group">
-				  <label for="newItemNumber">Anzahl:</label>
-				  <input type="number" class="form-control" id="newItemNumber" name="number" min="1" max="999" step="1" tabindex=2>
-			      </div>
-			      <!--picure-->
-			      <div class="form-group">
-				  <label for="newItemPicture">Bild:</label>
-				  <input type="file" class="form-control" id="newItemPicture" accept="image/*" tabindex=3>
+			      <div class="form-row">
+			      	  <div class="form-group col-md-10">
+				    <label for="newItemName">Name des Gegenstandes:</label>
+				    <input type="text" name="description" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=1>
+				 </div>
+				  <div class="form-group col-md-2">
+				    <label for="newItemNumber">Anzahl:</label>
+				    <input type="text" class="form-control" id="newItemNumber" name="number" min="1" max="999" step="1" tabindex=2>
+				</div>
 			      </div>
 			      <!--Kategorien-->
 			      <div class="form-group">
 				  <label for="newItemCategories">Kategorien:</label>
-				  <input type="text" class="form-control" id="newItemCategories" tabindex=4>
+				  <input type="text" class="form-control" id="newItemCategories" tabindex=3>
 			      </div>
-			      <!--Haltbarbis-->
-			      <div class="form-group">
-				  <label for="newItemBestBefore">Haltbar bis:</label>
-				  <input type="month" class="form-control" id="newItemBestBefore" tabindex=5>
-			      </div>
+
+			      <!--picure-->
+			      <div class="form-row">
+			      	<div class="form-group col-md-3">
+				  <button type="button" id="btn_choose_image" class="btn btn-light"><i class="fa fa-camera-retro fa-7x" style="display:block;width:128px; height:128px;"></i></button></div>
+				 <div class="form-group col-md-7">
+				  <label for="newItemLocation">Adresse des Gegenstandes:</label>
+				  <input type="text" class="form-control" id="newItemLocation" tabindex=5>
+			      	</div>
+				<div class="form-group col-md-2">
+				<label for="newItemBestBefore">Haltbar bis:</label>
+				  <input type="month" class="form-control" id="newItemBestBefore" tabindex=6>
+				</div>
+				</div>
 			      <!--URL-->
 			      <div class="form-group">
-				  <label for="newItemURL">URL:</label>
-				  <input type="url" class="form-control" id="newItemBestBefore" placeholder="http://owncloud.com" tabindex=6>
-			      </div>
-			      <!--Location-->
-			      <div class="form-group">
-				  <label for="newItemLocation">Adresse des Gegenstandes:</label>
-				  <input type="text" class="form-control" id="newItemLocation" tabindex=7>
-			      </div>
+				<label for="newItemURL">URL:</label>
+				  <input type="url" class="form-control" id="newItemBestBefore" placeholder="http://owncloud.com" tabindex=76>
+  			      </div>
 			      <!--Kommentare-->
 			      <div class="form-group">
     				<label for="newItemsComments">Kommentare:</label>

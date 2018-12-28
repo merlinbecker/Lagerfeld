@@ -23,6 +23,12 @@ function bindButtons(){
 		evt.stopPropagation();
 		return false;
 	});
+	$("#btn_choose_image").click(function(evt){
+		console.log("IMAGE BTN CLICKED!!");
+		$("#newItemPicture").click();
+		evt.stopPropagation();
+		return false;
+	});
 	$("#new_item_form").submit(function(evt){
 		alert("submit!");
 		evt.stopPropagation();
