@@ -6,4 +6,5 @@
 	position: absolute;
 	z-index: -1;
 	visibility:hidden;
+	display:none;
 }
