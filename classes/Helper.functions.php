@@ -142,6 +142,8 @@ function doDBChecks($db){
 						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
 						."`name` VARCHAR(255) NOT NULL ,"
 						."`uid` BIGINT NOT NULL,"
+						."`color` varchar(7),"
+						."`icon` varchar (32),"
 						."PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 			}
 			else return $e->getMessage();

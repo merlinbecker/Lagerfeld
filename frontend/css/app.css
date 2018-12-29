@@ -8,3 +8,11 @@
 	visibility:hidden;
 	display:none;
 }
+#btn_choose_image_placeholder{
+	display:block;
+	width:128px;
+	height:128px;
+}
+#btn_choose_image_image{
+	display:none
+}

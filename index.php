@@ -27,7 +27,7 @@ require_once "classes/Output.class.php";
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header("Access-Control-Allow-Origin: *");
 
-define("VERSION",0.2);
+define("VERSION",0.3);
 session_start();
 
 //ob_start();
@@ -58,6 +58,12 @@ $output=new Output();
 $output->setHeader($args);
 
 switch($args['commands'][0]){
+	case "Items":
+		if($args['method']=="POST"||$args['method']=="PUT"){
+			$output->setPayload(json_decode(file_get_contents('php://input')));
+			$output->sendOutput();
+		}
+	break;
 	case "User":
 		if($args['commands'][1]=="Status"){
 			$output->setPayload($user->logIn());
