@@ -1,6 +1,6 @@
 {
   "require": {
     	"league/oauth2-client": "2.3.*",
-		"paragonie/easydb":"^2"
+	"paragonie/easydb":"^2"
     }
 }

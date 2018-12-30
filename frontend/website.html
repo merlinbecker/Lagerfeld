@@ -108,7 +108,7 @@
 		      <div class="form-check" style="margin-left:10px;">
 			  <input type="checkbox" class="form-check-input" id="newItemIsContainer" name="isContainer" tabindex=1>
 			  <label class="form-check-label" for="newItemIsContainer">Ist auch ein Behälter</label>
-			<label for="newItemPicture"><input type="file" id="newItemPicture" style="visibility:hidden" name="picture" accept="mage/*"/></label>
+			<label for="newItemPicture"><input type="file" id="newItemPicture" style="visibility:hidden" name="picture" accept="mage/*"/></label><input type="hidden" name="parent" value=0 id="newItemParent"/>
 		      </div>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
 		</div>
@@ -118,7 +118,7 @@
 			      <div class="form-row">
 			      	  <div class="form-group col-md-10">
 				    <label for="newItemName">Name des Gegenstandes:</label>
-				    <input type="text" name="description" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=2>
+				    <input type="text" name="itemname" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=2>
 				 </div>
 				  <div class="form-group col-md-2">
 				    <label for="newItemNumber">Anzahl:</label>
@@ -135,13 +135,13 @@
 			      <div class="form-row">
 			      	<div class="form-group col-md-3">
 				  <button type="button" id="btn_choose_image" class="btn btn-light"><i id="btn_choose_image_placeholder" class="fa fa-camera-retro fa-7x" tabindex=5></i><img src="" id="btn_choose_image_image" border=0 /></button></div>
-				 <div class="form-group col-md-7">
-				  <label for="newItemLocation">Adresse des Gegenstandes:</label>
-				  <input type="text" class="form-control" id="newItemLocation" name="location" tabindex=6>
+				 <div class="form-group col-md-6">
+				  <label for="newItemLocation">Standortbeschreibung:</label>
+				  <input type="text" class="form-control" id="newItemLocation" name="location_desc" tabindex=6>
 			      	</div>
-				<div class="form-group col-md-2">
+				<div class="form-group col-md-3">
 				<label for="newItemBestBefore">Haltbar bis:</label>
-				  <input type="date" class="form-control" id="newItemBestBefore" name="best-before" tabindex=7>
+				  <input type="date" class="form-control" id="newItemBestBefore" name="best_before" tabindex=7>
 				</div>
 				</div>
 			      <!--URL-->

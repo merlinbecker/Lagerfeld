@@ -99,6 +99,7 @@ function doDBChecks($db){
 						."`url` VARCHAR(255) ,"
 						."`parent` BIGINT DEFAULT 0 ,"
 						."`uid` BIGINT NOT NULL ,"
+						."`location_desc` TEXT ,"
 						."`lat` DOUBLE ,"
 						."`lng` DOUBLE ,"
 						."`level` TINYINT,"
@@ -169,7 +170,7 @@ function doDBChecks($db){
 			if($e->getCode()=="42S02"){
 				$db->run("CREATE TABLE item_categories ( "
 						."`iid` BIGINT NOT NULL ,"
-						."`name` VARCHAR(255) NOT NULL ) ENGINE = InnoDB;");		
+						."`cid` VARCHAR(255) NOT NULL ) ENGINE = InnoDB;");		
 			}
 			else return $e->getMessage();
 		}

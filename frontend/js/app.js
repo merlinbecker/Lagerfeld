@@ -114,9 +114,7 @@ function bindButtons(){
 		var payload=objectifyForm($(this).serializeArray());
 		payload['picture']=$("#btn_choose_image_image").attr("src");
 		payload=JSON.stringify(payload);
-		console.log(payload);
 		$.post(BASE_URL+"Items",payload,function(data){
-			console.log("DATEN ERHALTEN!");
 			console.log(data);
 		}).fail(apiCallFailed);
 		alert("submit!");
