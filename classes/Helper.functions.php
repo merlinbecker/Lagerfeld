@@ -95,7 +95,7 @@ function doDBChecks($db){
 						."`id` BIGINT NOT NULL AUTO_INCREMENT ,"
 						."`name` VARCHAR(255) NOT NULL ,"
 						."`picture` TEXT ,"
-						."`best_before` BIGINT,"
+						."`best_before` BIGINT DEFAULT 0,"
 						."`url` VARCHAR(255) ,"
 						."`parent` BIGINT DEFAULT 0 ,"
 						."`uid` BIGINT NOT NULL ,"

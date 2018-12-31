@@ -3,7 +3,7 @@ $(document).ready(function(evt){
 	$("#nav_new_item").hide();
 	$("#nav_user_settings").hide();
 	$("#nav_search").hide();
-	$.getJSON(BASE_URL+"User/Status",setUserStatus).fail(apiCallFailed);
+	$.getJSON(BASE_URL+"User/Status",function(data){if(setUserStatus(data))fetchItems();}).fail(apiCallFailed);
 	bindButtons();
 });
 function readFile(file) {
@@ -115,14 +115,29 @@ function bindButtons(){
 		payload['picture']=$("#btn_choose_image_image").attr("src");
 		payload=JSON.stringify(payload);
 		$.post(BASE_URL+"Items",payload,function(data){
-			console.log(data);
+			$("#modal_new_item").modal("hide");
+			setUserStatus(data);
+			fetchItems();		
 		}).fail(apiCallFailed);
-		alert("submit!");
 		evt.stopPropagation();
 		return false;
 	});
 }
-
+/**
+fetch all Items which belong to the user
+**/
+function fetchItems(){
+	console.log("fetching items!");
+	$.getJSON(BASE_URL+"Items")
+		.done(function(data){
+			console.log(data);
+			displayItems(data);
+		})
+		.fail(apiCallFailed);
+}
+function displayItems(data){
+	
+};
 function objectifyForm(formArray) {//serialize data function
   var returnArray = {};
   for (var i = 0; i < formArray.length; i++){
@@ -135,23 +150,26 @@ function apiCallFailed(){
 	console.log("API Call failed!");
 }
 function setUserStatus(data){
-	if(data.payload.status=="not logged in"){
+	console.log(data);
+	if(data.payload.user.status=="not logged in"){
+		console.log("HIER HER!");
 		$("#nav_new_item").hide();
 		$("#nav_user_settings").hide();
 		$("#nav_search").hide();
-		$("#nav_user_login a").attr("href",data.payload.authURL);
+		$("#nav_user_login a").attr("href",data.payload.user.authURL);
 		$("#nav_user_login").show();
+		return false;
 	}
-	else if(data.payload.status=="logged in"){
-		$("#nav_user_settings").find(".nav-desc").html(data.payload.userdata.email);
+	else if(data.payload.user.status=="logged in"){
+		$("#nav_user_settings").find(".nav-desc").html(data.payload.user.userdata.email);
 		$("#nav_new_item").show();
 		$("#nav_user_settings").show();
 		$("#nav_search").show();
 		$("#nav_user_login").hide();
-		$("#modal_user_settings").find(".modal-body").html("logged in as : "+data.payload.userdata.email);
-		console.log("logged in");
+		$("#modal_user_settings").find(".modal-body").html("logged in as : "+data.payload.user.userdata.email);
+		return true;
 	}
-	console.log(data.payload);
+	return false;
 }
 function getCacheStatus(){
 var appCache = window.applicationCache;

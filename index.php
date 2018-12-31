@@ -62,15 +62,16 @@ switch($args['commands'][0]){
 		if($args['method']=="POST"||$args['method']=="PUT"){
 			$outdata=array();
 			$outdata['user']=$user->logIn();
+			if($user->isLoggedIn()){
 			//@todo refactor in class
 			//@todo how test a working refactoring?
-			//@todo Anzahl auslesen und entsprechend oft einfügen
 			$data=json_decode(file_get_contents('php://input'));
 			if(isset($data->id)){
 				//update 
 				//@todo check if permission is right to change
 			}
 			else{
+			/**@todo auslagern*/
 				$outdata['action']="insert";
 				$outdata['created']=array();	
 				$insertArray=array();
@@ -140,6 +141,25 @@ switch($args['commands'][0]){
 				}
 
 							
+			}}
+			$output->setPayload($outdata);
+			$output->sendOutput();
+		}
+		else if($args['method']=="GET"){
+			$outdata=array();
+			$outdata['user']=$user->logIn();
+			if($user->isLoggedIn()){
+				/**
+				@todo: freigegebene Items für andere auch beachten! zum beispiel für den marktplatz (spätere version)
+				**/
+				$rows = $db->run("SELECT id,name,picture,parent,COUNT(id) as anzahl FROM item WHERE uid=? or uid=0 GROUP BY name,parent",$user->getUserId());
+				foreach($rows as $row){
+					$row['categories']=$db->single("SELECT GROUP_CONCAT(cid) FROM item_categories WHERE iid=?",array($row['id']));;
+
+					$outdata['items'][]=$row;
+				}
+				$outdata['categories']=$db->run("SELECT DISTINCT categories.name,categories.id,COUNT(categories.id) as items FROM categories, item_categories,item WHERE cid=categories.id AND item.id=iid GROUP BY categories.id;
+");
 			}
 			$output->setPayload($outdata);
 			$output->sendOutput();
@@ -147,11 +167,11 @@ switch($args['commands'][0]){
 	break;
 	case "User":
 		if($args['commands'][1]=="Status"){
-			$output->setPayload($user->logIn());
+			$output->setPayload(array("user"=>$user->logIn()));
 			$output->sendOutput();
 		}
 		else if($args['commands'][1]=="LogOut"){
-			$output->setPayload($user->logout());
+			$output->setPayload(array("user"=>$user->logout()));
 			$output->sendOutput();
 		}
 		else if($args['commands'][1]=="LogIn"){
