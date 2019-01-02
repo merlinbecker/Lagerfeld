@@ -16,3 +16,118 @@
 #btn_choose_image_image{
 	display:none
 }
+
+/*******************************
+* MODAL AS LEFT/RIGHT SIDEBAR
+* Add "left" or "right" in modal parent div, after class="modal".
+* Get free snippets on bootpen.com
+*******************************/
+.modal.left .modal-dialog,
+.modal.right .modal-dialog
+{
+	position:fixed;
+	margin:auto;
+	width:320px;
+	height:100%;
+}
+.modal.left .modal-content,
+.modal.right .modal-content{
+	height: 100%;
+	overflow-y: auto;
+}
+.modal.left .modal-body,
+.modal.right .modal-body{
+	padding: 15px 15px 80px;
+}
+.modal.left.fade .modal-dialog{
+	left: -320px;
+	-webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+	-moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+	-o-transition: opacity 0.3s linear, left 0.3s ease-out;
+	transition: opacity 0.3s linear, left 0.3s ease-out;
+}
+.modal.right.fade .modal-dialog{
+	right: -320px;
+	-webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+	-moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+	-o-transition: opacity 0.3s linear, right 0.3s ease-out;
+	transition: opacity 0.3s linear, right 0.3s ease-out;
+}
+.modal.left.fade.show .modal-dialog{
+	left: 0;
+}
+.modal.right.fade.show .modal-dialog{
+	right: 0;
+}
+
+/* ----- MODAL STYLE ----- */
+	.modal-content.left,
+	.modal-content.right
+	{
+		border-radius: 0;
+		border: none;
+	}
+
+	.modal-header.left,
+	.modal-content.right {
+		border-bottom-color: #EEEEEE;
+		background-color: #FAFAFA;
+	}
+
+#nav_menu{
+	margin-right:3px;
+}
+.btn-circle.btn-xl {
+    	width: 70px;
+    	height: 70px;
+    	padding: 10px 16px;
+	border-radius: 35px!important;
+    	font-size: 24px;
+    	line-height: 1.33;
+}
+#btn_new_item{
+	position:fixed;
+	right:7px;
+	bottom:7px;
+	z-index:9999;
+}
+#list_categories li{
+	cursor:pointer;
+}
+.lagerfeld-item img{
+	width:64px;
+} 
+
+.dd-placeholder,
+.dd-empty { margin: 5px 0; padding: 0; min-height: 30px; background: #f2fbff; border: 1px dashed #b6bcbf; box-sizing: border-box; -moz-box-sizing: border-box; }
+.dd-empty { border: 1px dashed #bbb; min-height: 100px; background-color: #e5e5e5;
+    background-image: -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                      -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-image:    -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                         -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-image:         linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff),
+                              linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+.dd-empty,
+.dd-placeholder { display: block; position: relative; margin: 0; padding: 0; min-height: 20px; font-size: 13px; line-height: 20px; }
+.dd-dragel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999; }
+  .dd-dragel > .list-group-item .dd-handle {
+    margin-top: 0; }
+  .dd-dragel .dd-handle {
+box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.1); }
+.dd-nochildren .dd-placeholder {
+display: none; }
+.dd-expand {
+  display: none; }
+
+.dd-collapsed .list-group,
+.dd-collapsed .dd-collapse {
+  display: none; }
+
+.dd-collapsed .dd-expand {
+display: block; }

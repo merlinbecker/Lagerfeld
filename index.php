@@ -72,8 +72,6 @@ switch($args['commands'][0]){
 			}
 			else{
 			/**@todo auslagern*/
-				$outdata['action']="insert";
-				$outdata['created']=array();	
 				$insertArray=array();
 				$insertArray['uid']=$user->getUserId();
 				if(isset($data->parent)){
@@ -81,7 +79,8 @@ switch($args['commands'][0]){
 						$insertArray['parent']=$data->parent;
 				}
 				$insertArray['name']=$data->itemname;
-				if(isset($data->picture)){	
+				if(isset($data->picture)){
+					if($data->picture!=""){	
 					if(!is_dir("data")){
 						mkdir("data");	
 					}
@@ -94,7 +93,6 @@ switch($args['commands'][0]){
    					 	}	
 
     						$picdata = base64_decode($picdata);
-
     						if ($picdata === false) {
         						throw new \Exception('base64_decode failed');
    					 	}
@@ -103,6 +101,7 @@ switch($args['commands'][0]){
 					}
 					$insertArray['picture']=$outdata['filename']=uniqid("lf").".".$type;
 					file_put_contents("data/".$outdata['filename'], $picdata);
+					}
 				}
 				if(isset($data->best_before))$insertArray['best_before']=strtotime($data->best_before);
 				if(isset($data->url))$insertArray['url']=$data->url;
@@ -116,6 +115,7 @@ switch($args['commands'][0]){
 					$cats=explode(",",$data->categories);
 					foreach($cats as &$cat){
 						$cat=trim($cat);
+						if($cat=="")continue;
 						$catnr=$db->single("SELECT COUNT(`id`) FROM categories WHERE name=?",array($cat));
 						if($catnr==0){
 							$catnr=$db->insertGet('categories',array("name"=>$cat,"uid"=>$user->getUserId()),"id");
@@ -142,6 +142,9 @@ switch($args['commands'][0]){
 
 							
 			}}
+
+
+			$outdata['item'] = $db->run("SELECT id,parent,name,picture,container,parent,COUNT(id) as anzahl FROM item WHERE deleted=0 AND (uid=? or uid=0) AND id IN (".implode(",",$outdata['created']).") GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
 			$output->setPayload($outdata);
 			$output->sendOutput();
 		}
@@ -152,14 +155,13 @@ switch($args['commands'][0]){
 				/**
 				@todo: freigegebene Items für andere auch beachten! zum beispiel für den marktplatz (spätere version)
 				**/
-				$rows = $db->run("SELECT id,name,picture,parent,COUNT(id) as anzahl FROM item WHERE uid=? or uid=0 GROUP BY name,parent",$user->getUserId());
+				$rows = $db->run("SELECT id,parent,name,picture,container,parent,COUNT(id) as anzahl FROM item WHERE deleted=0 AND uid=? or uid=0 GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
 				foreach($rows as $row){
 					$row['categories']=$db->single("SELECT GROUP_CONCAT(cid) FROM item_categories WHERE iid=?",array($row['id']));;
 
 					$outdata['items'][]=$row;
 				}
-				$outdata['categories']=$db->run("SELECT DISTINCT categories.name,categories.id,COUNT(categories.id) as items FROM categories, item_categories,item WHERE cid=categories.id AND item.id=iid GROUP BY categories.id;
-");
+				$outdata['categories']=$db->run("SELECT DISTINCT categories.name,categories.id,COUNT(categories.id) as items FROM categories, item_categories,item WHERE cid=categories.id AND item.uid=? AND deleted=0 AND item.id=iid GROUP BY categories.id;",$user->getUserId());
 			}
 			$output->setPayload($outdata);
 			$output->sendOutput();

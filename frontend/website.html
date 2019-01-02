@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 		<head>
+		<!--META-->
 		<base href="<?=$BASE_URL;?>"/>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,8 +13,7 @@
 		<script type="text/javascript">
 			var BASE_URL="<?=$BASE_URL?>";
 		</script>	
-		<!-- todo maybe replace this with npm downloads -->
-		
+		<!--INCLUDES-->	
 		<!--jquery-->
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<!-- fontawesome-->
@@ -45,37 +45,55 @@
 		<script src="<?=$BASE_URL;?>frontend/js/tagsinput.js"></script>
 		<link rel="stylesheet" href="<?=$BASE_URL;?>frontend/css/tagsinput.css" />
 
+		<!--Nestable2 -->
+		<!--https://github.com/RamonSmit/Nestable2-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/nestable2/1.6.0/jquery.nestable.min.js" integrity="sha256-skap9xfySMjeSbzN4U+i+9/P0tCwxJUp+l/O4ntMI2Y=" crossorigin="anonymous"></script>
+	
 		<!-- custom css+js -->
 		<link rel="stylesheet" href="<?=$BASE_URL;?>frontend/css/app.css"/>
 		<script src="<?=$BASE_URL;?>frontend/js/Base64.js"></script>
 		<script src="<?=$BASE_URL;?>frontend/js/app.js"></script>
+
+		<!--HandleBars Templates-->
+		<script id="template_categories_list" type="text/x-handlebars-template">
+  			 <li class="list-group-item d-flex justify-content-between align-items-center" data-id="{{id}}">{{name}}<span class="badge badge-primary badge-pill">{{items}}</span></li>
+		</script>
+		<script id="template_items_list" type="text/x-handlebars-template">
+  			<li class="lagerfeld-item list-group-item list-group-item-action" data-container="{{container}}" data-categories="{{categories}}" data-id="{{id}}" data-parent="{{parent}}">
+			<img src="<?=$BASE_URL;?>data/{{picture}}" class="list-item-picture" border=0/>
+			 {{name}}<span class="dd-handle badge badge-primary badge-pill">x{{anzahl}}</span>
+			 
+			 </li>
+		</script>
 	</head>
 	<body>
 	  <!-- Navigation Panel -->
 	  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-	      <a class="navbar-brand" href="#"><span class="fa fa-box-open"></span>LF <?=VERSION;?></a>
-	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
-	      </button>
+		<button type="button" class="btn" id="nav_menu" data-toggle="modal" data-target="#modal_left">
+			<i class="fa fa-bars"></i>
+		</button>
 
-	      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
-		  <li class="nav-item" id="nav_new_item">
-		    <a class="nav-link" href="#"><span class="fa fa-plus-circle"></span>neuer Gegenstand</a>
-		  </li>
+	      <a class="navbar-brand" id="nav_brand" href="#"><span class="fa fa-box-open"></span>LF <?=VERSION;?></a>
+	    	<ul class="navbar-nav mr-auto">
 		  <li class="nav-item" id="nav_user_login">
 		    <a class="nav-link" href="#" ><span class="fa fa-sign-in-alt"></span>Log-In</a>
 		  </li>
 		  <li class="nav-item" id="nav_user_settings">
-		    <a class="nav-link" href="#"><span class="fa fa-user"></span><span class="nav-desc">USER</span</a>
+		    <a class="nav-link" href="#"><span class="fa fa-user"></span><span class="nav-desc"></span></a>
 		  </li>
+		   
 		</ul>
-		<form class="form-inline my-2 my-lg-0" id="nav_search">
-		  <input class="form-control mr-sm-2" type="search" placeholder="Suchen" aria-label="Suche">
-		</form>
-	      </div>
+		<button type="button" class="btn" id="nav_search" data-toggle="modal" data-target="#modal_right">
+			<i class="fa fa-search"></i>
+		</button>
 	  </nav>
-
+	<div id="content" class="dd">
+		<button type="button" class="btn btn-success btn-circle btn-xl" id="btn_new_item" data-toggle="modal" data-target="#modal_new_item">
+			<i class="fa fa-plus"></i>
+		</button>
+		<h2 class="text-center">Mein Lagerfeld</h2>
+		<ul class="list-group" id="lagerfeld"></ul>
+	</div>
 	  <!--MODALS-->
 	  <!--Modal User Settings-->
 	  <div class="modal fade" id="modal_user_settings" tabindex="-1">
@@ -107,7 +125,7 @@
 		  <h4 class="modal-title">neuer Gegenstand</h4>
 		      <div class="form-check" style="margin-left:10px;">
 			  <input type="checkbox" class="form-check-input" id="newItemIsContainer" name="isContainer" tabindex=1>
-			  <label class="form-check-label" for="newItemIsContainer">Ist auch ein Behälter</label>
+			  <label class="form-check-label" for="newItemIsContainer">kann andere Gegenstände aufnehmen</label>
 			<label for="newItemPicture"><input type="file" id="newItemPicture" style="visibility:hidden" name="picture" accept="mage/*"/></label><input type="hidden" name="parent" value=0 id="newItemParent"/>
 		      </div>
 		  <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -118,7 +136,7 @@
 			      <div class="form-row">
 			      	  <div class="form-group col-md-10">
 				    <label for="newItemName">Name des Gegenstandes:</label>
-				    <input type="text" name="itemname" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=2>
+				    <input type="text" required="true" name="itemname" class="form-control" id="newItemName" placeholder="Gegenstand" tabindex=2>
 				 </div>
 				  <div class="form-group col-md-2">
 				    <label for="newItemNumber">Anzahl:</label>
@@ -164,5 +182,35 @@
 	    </div>
 	  </div>
 
+	  <!-- Modal -->
+	    <div class="modal left fade" id="modal_left" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+		    <div class="modal-content left">
+		      <div class="modal-header left">
+			    <h4 class="modal-title"></h4>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		      </div>
+		      <div class="modal-body">
+			<ul class="list-group list-group-flush" id="list_categories"></ul>
+		      </div>
+		    </div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	    </div><!-- modal -->
+	    
+	    <!-- Modal -->
+	    <div class="modal right fade" id="modal_right" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+		    <div class="modal-content right">
+		      <div class="modal-header right">
+			    <h4 class="modal-title">Right Sidebar</h4>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		      </div>
+		      <div class="modal-body">
+			<p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+			</p>
+		      </div>
+		    </div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	    </div><!-- modal -->
 	</body>
 </html>
