@@ -94,8 +94,9 @@
 #list_categories li{
 	cursor:pointer;
 }
-.lagerfeld-item img{
+.list-item-picture{
 	width:64px;
+	display:inline-block;
 } 
 
 .dd-placeholder,
@@ -130,4 +131,38 @@ display: none; }
   display: none; }
 
 .dd-collapsed .dd-expand {
-display: block; }
+display: inline; }
+
+.indicator_container{
+	position:absolute;
+	top:2px;
+	left:2px;
+	display:none;
+	z-index:9;
+}
+.lagerfeld-item{
+	padding-left:64px;
+}
+#content{
+padding:5px;
+}
+.dd-handle{
+	background-color:#cccccc;
+	width:42px;
+	height:100%;
+	position:absolute;
+	top:0;
+	left:0;
+	cursor:pointer;
+}
+
+li.lagerfeld-item>ul{
+	margin-top:5px;
+}
+
+.dd-handle i{
+	 position: absolute;
+  	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+}

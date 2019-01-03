@@ -144,7 +144,7 @@ switch($args['commands'][0]){
 			}}
 
 
-			$outdata['item'] = $db->run("SELECT id,parent,name,picture,container,parent,COUNT(id) as anzahl FROM item WHERE deleted=0 AND (uid=? or uid=0) AND id IN (".implode(",",$outdata['created']).") GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
+			$outdata['item'] = $db->run("SELECT id,parent as parent_id,name,picture,container,COUNT(id) as anzahl FROM item WHERE deleted=0 AND (uid=? or uid=0) AND id IN (".implode(",",$outdata['created']).") GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
 			$output->setPayload($outdata);
 			$output->sendOutput();
 		}
@@ -155,7 +155,7 @@ switch($args['commands'][0]){
 				/**
 				@todo: freigegebene Items für andere auch beachten! zum beispiel für den marktplatz (spätere version)
 				**/
-				$rows = $db->run("SELECT id,parent,name,picture,container,parent,COUNT(id) as anzahl FROM item WHERE deleted=0 AND uid=? or uid=0 GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
+				$rows = $db->run("SELECT id,parent as parent_id,name,picture,container,parent,COUNT(id) as anzahl FROM item WHERE deleted=0 AND uid=? or uid=0 GROUP BY name,parent,container,picture ORDER BY parent ASC",$user->getUserId());
 				foreach($rows as $row){
 					$row['categories']=$db->single("SELECT GROUP_CONCAT(cid) FROM item_categories WHERE iid=?",array($row['id']));;
 

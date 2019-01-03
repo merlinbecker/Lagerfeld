@@ -1,9 +1,10 @@
-var lf_items;
+var template_items;
 $(document).ready(function(evt){
 	console.log(getCacheStatus());
 	$("#nav_new_item").hide();
 	$("#nav_user_settings").hide();
 	$("#nav_search").hide();
+	template_items=Handlebars.compile($("#template_items_list").html());
 	$.getJSON(BASE_URL+"User/Status",function(data){if(setUserStatus(data))fetchAllItems();}).fail(apiCallFailed);
 	bindButtons();
 });
@@ -131,9 +132,8 @@ function bindButtons(){
 }
 
 function addNewItem(data){
-	console.log("Neues Item wird hinzugefügt.");
-	lf_items.items.push(data);
-	displayItems(lf_items);
+	if(data.parent_id==0)delete data.parent_id;
+	$(".dd").nestable("add",data);
 }
 /**
 fetch all Items which belong to the user
@@ -143,7 +143,6 @@ function fetchAllItems(){
 	$.getJSON(BASE_URL+"Items")
 		.done(function(data){
 			console.log(data);
-			lf_items=data.payload;
 			displayItems(data.payload);
 		})
 		.fail(apiCallFailed);
@@ -158,41 +157,56 @@ function displayItems(data){
 		});
 	});
 	$("#lagerfeld").html("");
-	var template=Handlebars.compile($("#template_items_list").html());
-	$.each(data.items,function(k,val){
-		let html=template(val);
-		let elem=$(html);
-		elem.appendTo("#lagerfeld");
-		if(val.anzahl<=1)elem.find(".badge").css("display","none");
-		if(val.picture==null)elem.find(".list-item-picture").css("visibility","hidden");
-	});
-	//$("#content").nestable("destroy");
-	$('#content').nestable({
+	$('#lagerfeld').nestable({
 		"listNodeName":"ul",
+		"expandBtnHTML":"<button class='btn dd-expand' data-action='expand'><i class='fa fa-plus'></i></button>",
+		"collapseBtnHTML":"<button class='btn dd-collapse' data-action='collapse'><i class='fa fa-minus'></i></button>",
 		"itemClass":"list-group-item",
 		"listClass":"list-group",
+		"json":data.items,
+		itemRenderer: function(item_attrs, content, children, options, item) {
+			return html=template_items(item);
+		},
 		onDragStart: function (l, e) {
         		//only enable container items
 			console.log("on drag start!");
                 	l.find("[data-container=0]").addClass('dd-nochildren');
+			l.find("[data-container=1]").find(".indicator_container").css("display","block");
        		},
 		beforeDragStop: function(l,e, p){
         		/**@todo: wenn mehrere Items, dann nachfragen, wieviele verschoben werden sollen**/
 			// l is the main container
         		// e is the element that was moved
         		// p is the place where element was moved.
-			return true;
+			l.find("[data-container=1]").find(".indicator_container").css("display","none");
+			e.find(".indicator_container").css("display","none");
+			let par=p.parent().data("id");
+			let ident=e.data("id");
+			if(par!=undefined){
+				var data=Object();
+				data['id']=ident;
+				data['parent']=par;
+				updateItem(data);
+				console.log("MOVE Item"+ident+" in "+par);
+				return true;
+			}
+			else return false;
     		},
 		callback: function(l,e){
         		// l is the main container
         		// e is the element that was moved
-			console.log("moved!");
-			console.log(e.data("id"));
-			console.log(e.parent("lagerfeld-item").data("id"));
-			console.log("change item: set id to X");
     		}
 		});
     }
+function updateItem(data){
+	payload=JSON.stringify(payload);
+	$.post(BASE_URL+"Items",payload,function(data){
+			setUserStatus(data);
+			console.log(data);
+		}).fail(apiCallFailed);
+		}
+
+} 
 function objectifyForm(formArray) {//serialize data function
   var returnArray = {};
   for (var i = 0; i < formArray.length; i++){
@@ -206,20 +220,20 @@ function apiCallFailed(){
 }
 function setUserStatus(data){
 	if(data.payload.user.status=="not logged in"){
-		$("#container").hide();
+		$("#content").hide();
 		$("#nav_user_settings").hide();
 		$("#nav_search").hide();
 		$("#nav_user_login a").attr("href",data.payload.user.authURL);
 		$("#nav_user_login").show();
 		$("#nav_menu").hide();
-		$("#nav_brand").hide();
+		$("#nav_brand").show();
 		return false;
 	}
 	else if(data.payload.user.status=="logged in"){
 		$("#nav_user_settings").find(".nav-desc").html(data.payload.user.userdata.email);
 		$("#nav_user_settings").show();
 		$("#nav_search").show();
-		$("#container").show();
+		$("#content").show();
 		$("#nav_user_login").hide();
 		$("#modal_user_settings").find(".modal-body").html("logged in as : "+data.payload.user.userdata.email);
 		$("#nav_menu").show();
@@ -256,3 +270,29 @@ var appCache = window.applicationCache;
     		break;
 	};
 }
+Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+    switch (operator) {
+        case '==':
+            return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '===':
+            return (v1 === v2) ? options.fn(this) : options.inverse(this);
+        case '!=':
+            return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '!==':
+            return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+            return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+            return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+            return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+            return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        case '&&':
+            return (v1 && v2) ? options.fn(this) : options.inverse(this);
+        case '||':
+            return (v1 || v2) ? options.fn(this) : options.inverse(this);
+        default:
+            return options.inverse(this);
+    }
+});
