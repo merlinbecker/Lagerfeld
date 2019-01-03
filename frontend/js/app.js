@@ -157,15 +157,21 @@ function displayItems(data){
 		});
 	});
 	$("#lagerfeld").html("");
+	let tree=unflatten(data.items);	
+	console.log(tree);
 	$('#lagerfeld').nestable({
 		"listNodeName":"ul",
 		"expandBtnHTML":"<button class='btn dd-expand' data-action='expand'><i class='fa fa-plus'></i></button>",
 		"collapseBtnHTML":"<button class='btn dd-collapse' data-action='collapse'><i class='fa fa-minus'></i></button>",
 		"itemClass":"list-group-item",
 		"listClass":"list-group",
-		"json":data.items,
+		"json":tree,
 		itemRenderer: function(item_attrs, content, children, options, item) {
-			return html=template_items(item);
+			let html=template_items(item);
+			if(children!="<ul class=\"list-group\"></ul>")
+				html = html.replace("CHILDREN", children);
+			else html=html.replace("CHILDREN","");	
+			return html;
 		},
 		onDragStart: function (l, e) {
         		//only enable container items
@@ -197,15 +203,16 @@ function displayItems(data){
         		// e is the element that was moved
     		}
 		});
+		$("#lagerfeld").nestable("collapseAll");
     }
 function updateItem(data){
-	payload=JSON.stringify(payload);
+	payload=JSON.stringify(data);
 	$.post(BASE_URL+"Items",payload,function(data){
 			setUserStatus(data);
 			console.log(data);
+			$(".dd").nestable("remove",data.item[0].id);
+			addNewItem(data.payload.item[0]);		
 		}).fail(apiCallFailed);
-		}
-
 } 
 function objectifyForm(formArray) {//serialize data function
   var returnArray = {};
@@ -245,7 +252,6 @@ function setUserStatus(data){
 }
 function getCacheStatus(){
 var appCache = window.applicationCache;
-
 	switch (appCache.status) {
   		case appCache.UNCACHED: // UNCACHED == 0
     			return 'UNCACHED';
@@ -296,3 +302,32 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
             return options.inverse(this);
     }
 });
+function unflatten(arr) {
+  var tree = [],
+      mappedArr = {},
+      arrElem,
+      mappedElem;
+
+  // First map the nodes of the array to an object -> create a hash table.
+  for(var i = 0, len = arr.length; i < len; i++) {
+    arrElem = arr[i];
+    mappedArr[arrElem.id] = arrElem;
+    mappedArr[arrElem.id]['children'] = [];
+  }
+
+
+  for (var id in mappedArr) {
+    if (mappedArr.hasOwnProperty(id)) {
+      mappedElem = mappedArr[id];
+      // If the element is not at the root level, add it to its parent array of children.
+      if (mappedElem.parent_id) {
+        mappedArr[mappedElem['parent_id']]['children'].push(mappedElem);
+      }
+      // If the element is at the root level, add it to first level elements array.
+      else {
+        tree.push(mappedElem);
+      }
+    }
+  }
+  return tree;
+}
