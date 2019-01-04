@@ -67,6 +67,9 @@
 			<div class="dd-handle"><i class="fas fa-grip-lines-vertical"></i></div>
 			{{#if container}}
 			<span class="fa fa-box-open indicator_container"></span>
+			<div class="lf-container-select"><i class="fas fa-chevron-right"></i></div>
+			{{else}}
+			<div class="lf-item-edit"><i class="fas fa-edit"></i></div>
 			{{/if}}
 			{{#ifCond picture  "==" null}}
 			<div class="list-item-picture"><i class="fa fa-question fa-6x"></i></div>
@@ -79,6 +82,9 @@
 			 {{/ifCond}}
 			 CHILDREN
 			 </li>
+		</script>
+		<script id="template_edit_form" type="text/x-handlears-template">
+		<!--@todo: hier das Formular auslagern-->
 		</script>
 	</head>
 	<body>
@@ -102,6 +108,13 @@
 			<i class="fa fa-search"></i>
 		</button>
 	  </nav>
+	  <nav aria-label="breadcrumb" id="nav_breadcrumb">
+  		<ol class="breadcrumb">
+    			<li class="breadcrumb-item"><a href="#">Mein Lagerfeld</a></li>
+    			<li class="breadcrumb-item"><a href="#">Testcontainer 1</a></li>
+    			<li class="breadcrumb-item active" aria-current="page">aktiver Container</li>
+  		</ol>
+	</nav>
 	<div id="content">
 		<button type="button" class="btn btn-success btn-circle btn-xl" id="btn_new_item" data-toggle="modal" data-target="#modal_new_item">
 			<i class="fa fa-plus"></i>

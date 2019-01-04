@@ -142,6 +142,7 @@ display: inline; }
 }
 .lagerfeld-item{
 	padding-left:64px;
+	padding-right:32px;
 }
 #content{
 padding:5px;
@@ -155,12 +156,21 @@ padding:5px;
 	left:0;
 	cursor:pointer;
 }
+.lf-container-select,.lf-item-edit{
+	background-color:#cccccc;
+	width:42px;
+	height:100%;
+	position:absolute;
+	top:0;
+	right:0;
+	cursor:pointer;
+}
 
 li.lagerfeld-item>ul{
 	margin-top:5px;
 }
 
-.dd-handle i{
+.dd-handle i,.lf-container-select i, .lf-item-edit i{
 	 position: absolute;
   	top: 50%;
   	left: 50%;

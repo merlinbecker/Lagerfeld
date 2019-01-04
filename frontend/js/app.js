@@ -205,6 +205,9 @@ function displayItems(data){
     		}
 		});
 		$("#lagerfeld").nestable("collapseAll");
+		$(".lf-container-select").click(function(evt){
+			alert("click!");
+		});
     }
 function updateItem(data){
 	payload=JSON.stringify(data);

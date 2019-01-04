@@ -44,10 +44,11 @@ class Item{
 			foreach($cats as &$cat){
 				$cat=trim($cat);
 				if($cat=="")continue;
-				$catnr=$this->db->single("SELECT COUNT(`id`) FROM categories WHERE name=?",array($cat));
-				if($catnr==0){
+				$catnr=$this->db->single("SELECT `id` FROM categories WHERE name=?",array($cat));
+				if(!$catnr){
 					$catnr=$this->db->insertGet('categories',array("name"=>$cat,"uid"=>$this->user->getUserId()),"id");
-					}$categories[]=$catnr;
+				} 
+				$categories[]=$catnr;
 			}
 		}	
 
@@ -99,7 +100,7 @@ class Item{
 			."AND (uid=? or uid=0) "
 			.$cond
 			."GROUP BY name,parent,container,picture "
-			."ORDER BY parent ASC";
+			."ORDER BY container DESC";
 		$rows=$this->db->run($query,$this->user->getUserId());
 		foreach($rows as $row){
 			$row['categories']=$this->db->single("SELECT GROUP_CONCAT(cid) FROM item_categories WHERE iid=?",array($row['id']));
@@ -109,14 +110,14 @@ class Item{
 	}
 	public function getCategories($ids=0){
 		$cond=is_array($ids)?"AND item.id IN (".implode(",",$ids).") ":" ";
-		$query="SELECT DISTINCT categories.name,categories.id,COUNT(categories.id) as items " 
+		$query="SELECT categories.name,categories.id,COUNT(categories.id) as items " 
 		."FROM categories, item_categories,item "
 		."WHERE cid=categories.id "
 		."AND item.uid=? "
 		."AND deleted=0 "
 		."AND item.id=iid "
 		.$cond 
-		."GROUP BY categories.id;";
+		."GROUP BY categories.name;";
 		$rows=$this->db->run($query,$this->user->getUserId());
 		return $rows;
 	}
