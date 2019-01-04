@@ -28,14 +28,11 @@ require_once "classes/Item.class.php";
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header("Access-Control-Allow-Origin: *");
 
-define("VERSION","0.4.1 alpha");
+define("VERSION","0.4.22 alpha");
 session_start();
 
 //ob_start();
 
-/**
- * @TODO make a helper class out of this (and the absolute url)
- ***/
 
 if(file_exists($CONFIG_PATH)){
 	$conf=(array)json_decode(urldecode(file_get_contents($CONFIG_PATH)));

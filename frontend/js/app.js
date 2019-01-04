@@ -166,6 +166,7 @@ function displayItems(data){
 		"itemClass":"list-group-item",
 		"listClass":"list-group",
 		"json":tree,
+		"scroll":true,
 		itemRenderer: function(item_attrs, content, children, options, item) {
 			let html=template_items(item);
 			if(children!="<ul class=\"list-group\"></ul>")
