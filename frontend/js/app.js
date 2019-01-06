@@ -177,7 +177,7 @@ function displayItems(data){
 		onDragStart: function (l, e) {
         		//only enable container items
 			console.log("on drag start!");
-                	l.find("[data-container=0]").addClass('dd-nochildren');
+//                	l.find("[data-container=0]").addClass('dd-nochildren');
 			l.find("[data-container=1]").find(".indicator_container").css("display","block");
        		},
 		beforeDragStop: function(l,e, p){
