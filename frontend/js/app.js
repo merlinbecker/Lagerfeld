@@ -189,15 +189,15 @@ function displayItems(data){
 			e.find(".indicator_container").css("display","none");
 			let par=p.parent().data("id");
 			let ident=e.data("id");
-			if(par!=undefined){
-				var data=Object();
-				data['id']=ident;
-				data['parent']=par;
-				updateItem(data);
-				console.log("MOVE Item"+ident+" in "+par);
-				return true;
-			}
-			else return false;
+			if(par==undefined){par=0;}
+			var data=Object();
+			data['id']=ident;
+			data['parent']=par;
+			updateItem(data);
+			console.log("MOVE Item"+ident+" in "+par);
+			return true;
+		
+		
     		},
 		callback: function(l,e){
         		// l is the main container
