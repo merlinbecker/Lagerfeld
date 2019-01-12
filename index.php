@@ -28,7 +28,7 @@ require_once "classes/Item.class.php";
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header("Access-Control-Allow-Origin: *");
 
-define("VERSION","0.4.22 alpha");
+define("VERSION","0.4.3 alpha");
 session_start();
 
 //ob_start();

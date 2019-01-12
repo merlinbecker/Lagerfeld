@@ -189,15 +189,30 @@ function displayItems(data){
 			e.find(".indicator_container").css("display","none");
 			let par=p.parent().data("id");
 			let ident=e.data("id");
+			let data_ids=e.data("grouped-ids");
 			if(par==undefined){par=0;}
 			var data=Object();
 			data['id']=ident;
+			data['grouped_ids']=data_ids;
+			//check if more than one item is grouped
+			let count_group=String(data['grouped_ids']).split(",");
+			if(count_group.length>1){
+				let anzahl=window.prompt("Wieviele Items sollen verschoben werden?", count_group.length);
+				if(anzahl == null) return false;
+				data['anzahl']=anzahl;
+			}else data['anzahl']=1;
 			data['parent']=par;
-			updateItem(data);
-			console.log("MOVE Item"+ident+" in "+par);
-			return true;
-		
-		
+			let splitted=false;
+			if(data['anzahl']<count_group.length){
+				splitted=true;
+				let rest=count_group.length-data['anzahl'];
+				//change the old items count
+				//(at)todo: auch die data-grouped ändern!!
+				e.find(".lf-item-anzahl").html("x"+rest);
+			}
+			updateItem(data,splitted);
+			console.log("MOVE Item"+ident+" in "+par+" with grouped items"+data_ids+" and do a split ",splitted);
+			return false;
     		},
 		callback: function(l,e){
         		// l is the main container
@@ -209,12 +224,14 @@ function displayItems(data){
 			alert("click!");
 		});
     }
-function updateItem(data){
+function updateItem(data,splitted=false){
 	payload=JSON.stringify(data);
+	var old_id=data.id;
 	$.post(BASE_URL+"Items",payload,function(data){
 			setUserStatus(data);
 			console.log(data);
-			$(".dd").nestable("remove",data.item[0].id);
+			if(!splitted)
+				$(".dd").nestable("remove",old_id);
 			addNewItem(data.payload.item[0]);		
 		}).fail(apiCallFailed);
 } 

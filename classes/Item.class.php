@@ -94,12 +94,12 @@ class Item{
 	public function getItem($ids=0){
 		$outdata=array();
 		$cond=is_array($ids)?"AND id IN (".implode(",",$ids).") ":" ";
-		$query="SELECT id,parent as parent_id,name,picture,container,COUNT(id) as anzahl "
+		$query="SELECT id,parent as parent_id,name,picture,container,COUNT(id) as anzahl, GROUP_CONCAT(id) as grouped_ids, GROUP_CONCAT(picture) as grouped_pictures "
 			."FROM item "
 			."WHERE deleted=0 "
 			."AND (uid=? or uid=0) "
 			.$cond
-			."GROUP BY name,parent,container,picture "
+			."GROUP BY name,parent,container "
 			."ORDER BY container DESC";
 		$rows=$this->db->run($query,$this->user->getUserId());
 		foreach($rows as $row){
@@ -122,19 +122,30 @@ class Item{
 		return $rows;
 	}
 	public function update($data){
-		$this->db->update('item',(array)$data,
- 		[
-			'id'=>$data->id,
-    			'uid' => $this->user->getUserId()
-		]);
-		if(isset($data->parent)){
-			$this->writeHistory(self::HISTORY_ADD_TO_PARENT,$data->id,$data->parent);	
+		$grouped_ids=isset($data->grouped_ids)?explode(",",$data->grouped_ids):array($data->id);
+		$grouped_ids=array_reverse($grouped_ids);
+		$groupleader=$data->id;
+		$limit=isset($data->anzahl)?$data->anzahl:0;
+		unset($data->id,$data->grouped_ids,$data->anzahl);
+		$count_limit=0;
+		foreach($grouped_ids as $item){
+			$groupleader=$item;
+			$this->db->update('item',(array)$data,
+ 			[	
+				'id'=>$item,
+    				'uid' => $this->user->getUserId()
+			]);
+			if(isset($data->parent)){
+				$this->writeHistory(self::HISTORY_ADD_TO_PARENT,$item,$data->parent);	
+			}
+			else if(isset($data->deleted)){
+				$this->writeHistory(self::HISTORY_DELETE_ITEM,$item);
+			}
+			else $this->writeHistory(self::HISTORY_CHANGE_ITEM,$item);
+			$count_limit++;
+			if($count_limit>=$limit)break;
 		}
-		else if(isset($data->deleted)){
-			$this->writeHistory(self::HISTORY_DELETE_ITEM,$data->id);
-		}
-		else $this->writeHistory(self::HISTORY_CHANGE_ITEM,$data->id);
-		return $this->getItem(array($data->id));
+		return $this->getItem(array($groupleader));
 	}
 	
 	private function processPictureData($base64pic){

@@ -63,7 +63,7 @@
   			 <li class="list-group-item d-flex justify-content-between align-items-center" data-id="{{id}}">{{name}}<span class="badge badge-primary badge-pill">{{items}}</span></li>
 		</script>
 		<script id="template_items_list" type="text/x-handlebars-template">
-  			<li class="lagerfeld-item list-group-item list-group-item-action" data-container="{{container}}" data-categories="{{categories}}" data-id="{{id}}" data-parent="{{parent_id}}">
+  			<li class="lagerfeld-item list-group-item list-group-item-action" data-grouped-ids="{{grouped_ids}}" data-container="{{container}}" data-categories="{{categories}}" data-id="{{id}}" data-parent="{{parent_id}}">
 			<div class="dd-handle"><i class="fas fa-grip-lines-vertical"></i></div>
 			{{#if container}}
 			<span class="fa fa-box-open indicator_container"></span>
@@ -78,7 +78,7 @@
 			{{/ifCond}}
 			 {{name}}
 			{{#ifCond anzahl ">" 1}}	 
-			 <span class="badge badge-primary badge-pill">x{{anzahl}}</span>
+			 <span class="lf-item-anzahl badge badge-primary badge-pill">x{{anzahl}}</span>
 			 {{/ifCond}}
 			 CHILDREN
 			 </li>
